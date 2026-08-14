@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPosts } from './api';
+import Feedback from './pages/Feedback';
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     fetchPosts().then((data) => {
@@ -13,6 +15,20 @@ function App() {
   }, []);
 
   if (loading) {
+    if (showFeedback) {
+  return (
+    <div className="min-h-screen bg-gray-950 text-gray-100 p-4 max-w-md mx-auto">
+      <button
+        onClick={() => setShowFeedback(false)}
+        className="mb-4 text-sky-400 text-sm font-semibold"
+      >
+        ← Back to Campus Feed
+      </button>
+
+      <Feedback />
+    </div>
+  );
+}
     return (
       <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
         <p className="animate-pulse text-lg">Loading feed...</p>
@@ -24,8 +40,19 @@ function App() {
     <div className="min-h-screen bg-gray-950 text-gray-100 p-4 max-w-md mx-auto">
       {/* Header */}
       <header className="mb-6 border-b border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold tracking-tight text-white">Campus Feed</h1>
-      </header>
+  <div className="flex justify-between items-center">
+    <h1 className="text-2xl font-bold tracking-tight text-white">
+      Campus Feed
+    </h1>
+
+    <button
+      onClick={() => setShowFeedback(true)}
+      className="bg-sky-500 hover:bg-sky-400 text-gray-950 font-bold px-3 py-2 rounded-lg text-xs"
+    >
+      💡 Share Idea
+    </button>
+  </div>
+</header>
 
       {/* Feed Cards */}
       <div className="space-y-4">
