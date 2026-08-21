@@ -1,46 +1,59 @@
-# Community Hub
+# Week 11: Community Hub – Event Inviter
 
-A full-stack community management platform built with React, Node.js/Express, and MongoDB.
+## Author
+- **Name:** Albert (Efan Tech)
+- **GitHub:** [@efan-tech](https://github.com/efan-tech)
+- **Date:** August 21, 2026
 
-## 🚀 Live Deployments
-- **Frontend (Vercel):** https://community-hub-murex.vercel.app
-- **Backend (Render):** https://community-hub-2af6.onrender.com
+## Project Description
+A full-stack community platform that allows people to invite each other to any kind of event — arts, tech meetups, sports, or general activities. Users can create event invites, view the community feed, RSVP, comment, and interact with other members.
 
-## 🛠️ Tech Stack
-- **Frontend:** React, Vite, Tailwind CSS, Axios
-- **Backend:** Node.js, Express, MongoDB, CORS
-- **Hosting:** Vercel (Frontend), Render (Backend)
-## 👥 Contributors
+## Technologies Used
+- HTML5
+- CSS3 / Tailwind CSS
+- JavaScript
+- React + Vite
+- Node.js + Express
+- MongoDB
+- Axios
+- Vercel (Frontend)
+- Render (Backend)
 
-- **Stella / Efan Tech** ([@efan-tech](https://github.com/efan-tech)) — Lead Developer & Architect
-- **Musembi Joel** ([@musembijoel](https://github.com/musembijoel)) — Contributor
-- **Francis Waceke** ([@wacekefrancis2-droid](https://github.com/wacekefrancis2-droid)) — Contributor
-- **Nahashon Munyiri Mutahi** ([@nahashonmutahi95](https://github.com/nahashonmutahi95)) — Contributor
-- **Mercy Muiruri** ([@mercymuiruri-hue](https://github.com/mercymuiruri-hue)) — Contributor
-- **Yvonne** ([@yvonneofficials06](https://github.com/yvonneofficials06)) — Contributor
+## Features
+- Create and publish event invitations
+- Categories for Arts, Faith/Catholic, Tech, Sports, etc.
+- Community feed with event cards
+- RSVP / Join functionality
+- Comments and reactions
+- User authentication (login/register)
+- Feedback system
+- Mobile-friendly design
 
-## 📁 Repository Structure
-community-hub/
-├── frontend/    # Vite + React UI & Components
-└── backend/     # Express API Routes & Database Models
-
-## ⚙️ Local Development Setup
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/efan-tech/community-hub.git
-cd community-hub
-```
-frontend setup
+## How to Run
+1. Clone this repository
+2. Backend:
+   ```bash
+   cd backend
+   npm install
+   npm start
+    ```
+3.Frontend:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-backend setup
-```bash
-cd ../backend
-npm install
-npm start
-```
-
+##Lessons Learned
+-Building a full-stack application with React and Express
+-Working with MongoDB Atlas
+-Deploying frontend and backend separately
+-Collaborating with a team using GitHub Pull Requests
+-Handling authentication and user state
+##Challenges Faced
+-Synchronizing frontend state with the backend API
+-Making the invite/RSVP system work correctly
+-Ensuring all team contributions appear on GitHub Insights
+-Deploying and connecting Vercel frontend to Render backend
+## Live Demo
+** Frontend: https://community-hub-murex.vercel.app
+** Backend: https://community-hub-2af6.onrender.com
