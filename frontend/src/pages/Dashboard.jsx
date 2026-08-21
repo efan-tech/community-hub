@@ -1,179 +1,280 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-const CATEGORY_DATA = [
-  { id: 'All', name: 'All Events', tag: 'Live', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Hackathons', name: 'Hackathons', tag: 'Code & Build', image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Art & Craft', name: 'Art & Craft', tag: 'Exhibitions', image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Cultural Festivals', name: 'Cultural Fests', tag: 'Music & Food', image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Summer Tides', name: 'Summer Tides', tag: 'Beach Trips', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80' },
-  { id: 'Travel & Tours', name: 'Travel & Tours', tag: 'Expeditions', image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80' }
+// Community Members Active/Inactive Data
+const INITIAL_MEMBERS = [
+  { id: 1, name: 'Nahashon', handle: '@nahashon_tech', status: 'Active', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80' },
+  { id: 2, name: 'Drex', handle: '@drex_dev', status: 'Active', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&q=80' },
+  { id: 3, name: 'Mercy', handle: '@mercy_art', status: 'Offline', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80' },
+  { id: 4, name: 'Yvonne', handle: '@yvonne_c', status: 'Active', avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=120&q=80' },
+  { id: 5, name: 'Joel', handle: '@joel_m', status: 'Offline', avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=120&q=80' }
 ];
 
-const FEATURED_HIGHLIGHTS = [
-  { title: '🔥 Campus Hackathon 2026', sub: '48-Hour Sprint • Win Prizes & Badges', img: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80' },
-  { title: '🌊 Coastal Summer Tide Trip', sub: 'Beach Camping & Volleyball • Sept 02', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80' },
-  { title: '🎨 Arts & Craft Night', sub: 'Live Exhibition & Student Gallery', img: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80' }
-];
+const Dashboard = ({ posts = [], onAddPost, currentUser = {}, setShowFeedback }) => {
+  const [form, setForm] = useState({
+    title: '',
+    category: 'Hackathons',
+    venue: '',
+    date: '',
+    image: '',
+    description: ''
+  });
 
-const Dashboard = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [heroIndex, setHeroIndex] = useState(0);
-  const [posts, setPosts] = useState([]);
+  const [likeCounts, setLikeCounts] = useState({});
+  const [commentsState, setCommentsState] = useState({});
+  const [commentInputs, setCommentInputs] = useState({});
 
-  // Auto carousel slide timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % FEATURED_HIGHLIGHTS.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.title.trim()) return;
 
-  // Live MongoDB Fetching
-  useEffect(() => {
-    fetch('http://localhost:5000/api/posts')
-      .then((res) => res.json())
-      .then((data) => setPosts(data))
-      .catch((err) => console.error('Error fetching posts:', err));
-  }, []);
+    onAddPost({
+      ...form,
+      club: currentUser.username || 'Nahashon',
+      image: form.image || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80'
+    });
 
-  const filteredPosts = selectedCategory === 'All'
-    ? posts
-    : posts.filter(p => p.category === selectedCategory);
+    setForm({ title: '', category: 'Hackathons', venue: '', date: '', image: '', description: '' });
+  };
+
+  const handleLike = (id, baseLikes = 0) => {
+    setLikeCounts(prev => ({
+      ...prev,
+      [id]: (prev[id] ?? baseLikes) + 1
+    }));
+  };
+
+  const handleAddComment = (id) => {
+    const text = commentInputs[id];
+    if (!text || !text.trim()) return;
+
+    setCommentsState(prev => ({
+      ...prev,
+      [id]: [...(prev[id] || []), { user: currentUser.username || 'Nahashon', text }]
+    }));
+    setCommentInputs(prev => ({ ...prev, [id]: '' }));
+  };
 
   return (
-    <div className="min-h-screen bg-[#050b14] text-slate-100 font-sans max-w-md mx-auto pb-10">
-      
-      {/* Quantum Logic Top Bar */}
-      <div className="flex justify-between items-center bg-[#09101f] px-4 py-3 border-b border-slate-800/80 mb-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
-          <span className="text-xs font-black tracking-widest text-white uppercase">Quantum Logic</span>
+    <div className="min-h-screen bg-[#050b14] text-gray-100 p-4 max-w-md mx-auto space-y-6 pb-12">
+      {/* Top Navbar Header */}
+      <header className="flex items-center justify-between py-2 border-b border-slate-800">
+        <div className="flex items-center space-x-2">
+          <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+          <span className="font-bold tracking-wider text-sm uppercase text-gray-100">Quantum Logic</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-slate-300">Dashboard</span>
-          <button className="bg-red-950/40 text-red-400 border border-red-900/60 text-[11px] font-bold px-2.5 py-1 rounded-md hover:bg-red-900/40 transition-colors">
-            Terminate Session
-          </button>
+        <button 
+          onClick={() => setShowFeedback(true)}
+          className="text-xs bg-red-950/40 text-red-400 border border-red-800/50 px-3 py-1.5 rounded-md font-medium hover:bg-red-900/30 transition"
+        >
+          Terminate Session
+        </button>
+      </header>
+
+      {/* Logged in User Profile Info */}
+      <div className="bg-[#0b1329] border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <img 
+            src={currentUser.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"} 
+            alt="User Avatar" 
+            className="w-10 h-10 rounded-full border border-sky-400/50 object-cover" 
+          />
+          <div>
+            <h3 className="font-semibold text-sm text-white">{currentUser.username || 'Nahashon'}</h3>
+            <p className="text-xs text-sky-400">{currentUser.handle || '@nahashon_tech'}</p>
+          </div>
         </div>
+        <span className="flex items-center text-xs text-emerald-400 bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-800/40 font-medium">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          Active
+        </span>
       </div>
 
-      <div className="px-3.5 space-y-5">
-        
-        {/* Featured Highlight Hero Box */}
-        <div className="relative h-44 rounded-2xl overflow-hidden border border-slate-800 shadow-xl">
-          <img src={FEATURED_HIGHLIGHTS[heroIndex].img} alt="Hero" className="w-full h-full object-cover" />
-          
-          {/* Top Pagination Dots */}
-          <div className="absolute top-3 right-3 flex gap-1.5 z-10">
-            {FEATURED_HIGHLIGHTS.map((_, i) => (
-              <span
-                key={i}
-                onClick={() => setHeroIndex(i)}
-                className={`w-2 h-2 rounded-full cursor-pointer transition-all ${
-                  heroIndex === i ? 'bg-sky-400 shadow-[0_0_6px_#38bdf8]' : 'bg-white/30'
-                }`}
-              />
-            ))}
-          </div>
+      {/* Online / Offline Community Status Tracker */}
+      <section className="space-y-2">
+        <h4 className="text-xs uppercase font-bold text-slate-400 tracking-wider">Community Status</h4>
+        <div className="flex space-x-3 overflow-x-auto py-1 scrollbar-none">
+          {INITIAL_MEMBERS.map((member) => (
+            <div key={member.id} className="flex-shrink-0 flex items-center space-x-2 bg-[#08101e] border border-slate-800/80 px-2.5 py-1.5 rounded-lg">
+              <div className="relative">
+                <img src={member.avatar} alt={member.name} className="w-6 h-6 rounded-full object-cover" />
+                <span className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900 ${member.status === 'Active' ? 'bg-emerald-400' : 'bg-slate-500'}`}></span>
+              </div>
+              <span className="text-xs text-slate-300 font-medium">{member.name}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-[#050b14]/50 to-transparent p-4 flex flex-col justify-end text-center">
-            <span className="text-[10px] font-bold text-sky-400 tracking-wider uppercase mb-0.5">Featured Highlight</span>
-            <h2 className="text-lg font-extrabold text-white tracking-tight">{FEATURED_HIGHLIGHTS[heroIndex].title}</h2>
-            <p className="text-xs text-slate-300 mt-0.5">{FEATURED_HIGHLIGHTS[heroIndex].sub}</p>
-          </div>
+      {/* Sleek Compact Post an Activity Form */}
+      <section className="bg-[#0b1329] border border-slate-800 p-4 rounded-xl space-y-3">
+        <div className="flex items-center space-x-2">
+          <img 
+            src={currentUser.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"} 
+            alt="User" 
+            className="w-6 h-6 rounded-full object-cover" 
+          />
+          <h3 className="font-bold text-sm text-white">Post an Activity</h3>
         </div>
 
-        {/* Categories Section */}
-        <div>
-          <div className="flex justify-between items-center mb-2.5 px-0.5">
-            <h3 className="text-sm font-extrabold text-white">Categories</h3>
-            <span className="text-[11px] text-slate-400 font-medium">Swipe 👈 👉</span>
+        <form onSubmit={handleSubmit} className="space-y-2.5">
+          <input 
+            type="text" 
+            placeholder="What's happening? (e.g., Code sprint, Beach trip)"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            className="w-full bg-[#050b14] border border-slate-700/70 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            required
+          />
+
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="bg-[#050b14] border border-slate-700/70 rounded-lg px-2.5 py-2 text-xs text-white focus:outline-none focus:border-sky-500"
+            >
+              <option value="Hackathons">Hackathons</option>
+              <option value="Art & Craft">Art & Craft</option>
+              <option value="Cultural Festivals">Cultural Festivals</option>
+              <option value="Summer Tides">Summer Tides</option>
+            </select>
+            <input 
+              type="text"
+              placeholder="Venue / Spot"
+              value={form.venue}
+              onChange={(e) => setForm({ ...form, venue: e.target.value })}
+              className="bg-[#050b14] border border-slate-700/70 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
           </div>
 
-          <div className="flex gap-3 overflow-x-auto pb-2 snap-x no-scrollbar">
-            {CATEGORY_DATA.map((cat) => {
-              const isActive = selectedCategory === cat.id;
-              return (
-                <div
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex-none w-32 h-24 rounded-2xl overflow-hidden relative snap-start cursor-pointer border-2 transition-all ${
-                    isActive
-                      ? 'border-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.35)] scale-[1.02]'
-                      : 'border-slate-800/80 opacity-80 hover:opacity-100'
-                  }`}
-                >
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-[#050b14]/40 to-transparent p-2 flex flex-col justify-end text-center">
-                    <span className="text-[9px] text-sky-400 font-bold">{cat.tag}</span>
-                    <h4 className="text-xs text-white font-extrabold leading-tight mt-0.5">{cat.name}</h4>
-                  </div>
+          <div className="grid grid-cols-2 gap-2">
+            <input 
+              type="text"
+              placeholder="Date / Schedule"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+              className="bg-[#050b14] border border-slate-700/70 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
+            <input 
+              type="text"
+              placeholder="Image URL (Optional)"
+              value={form.image}
+              onChange={(e) => setForm({ ...form, image: e.target.value })}
+              className="bg-[#050b14] border border-slate-700/70 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+            />
+          </div>
+
+          <textarea 
+            rows="2"
+            placeholder="Tell Nahashon, Drex, Mercy, Yvonne, and Joel what to expect..."
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className="w-full bg-[#050b14] border border-slate-700/70 rounded-lg p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 resize-none"
+          ></textarea>
+
+          <button 
+            type="submit"
+            className="w-full bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition flex items-center justify-center space-x-1"
+          >
+            <span>🚀 Publish Event</span>
+          </button>
+        </form>
+      </section>
+
+      {/* Community Feed Container */}
+      <section className="space-y-4">
+        <h3 className="font-bold text-sm text-white tracking-wide">Campus Community Feed</h3>
+
+        {posts.map((post) => {
+          const likes = likeCounts[post.id] ?? post.likes ?? 0;
+          const comments = commentsState[post.id] || post.comments || [];
+
+          return (
+            <div 
+              key={post.id} 
+              className={`bg-[#0b1329] rounded-xl overflow-hidden border transition-all duration-300 ${
+                post.isNew 
+                  ? 'border-sky-500/40 shadow-[0_0_12px_rgba(56,189,248,0.2)]' 
+                  : 'border-slate-800/90 hover:border-slate-700'
+              }`}
+            >
+              {/* Scaled Compact Image Banner */}
+              <div className="relative h-44 w-full bg-slate-900 overflow-hidden">
+                <img 
+                  src={post.image} 
+                  alt={post.title} 
+                  className="w-full h-full object-cover" 
+                />
+                <span className="absolute top-2.5 right-2.5 bg-slate-950/80 backdrop-blur-md text-sky-400 text-[10px] font-semibold px-2.5 py-1 rounded-md border border-slate-700/60">
+                  {post.category}
+                </span>
+                {post.isNew && (
+                  <span className="absolute top-2.5 left-2.5 bg-sky-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded shadow">
+                    NEW POST
+                  </span>
+                )}
+              </div>
+
+              {/* Card Body */}
+              <div className="p-3.5 space-y-2.5">
+                <div className="flex items-center text-[11px] text-sky-400 space-x-3">
+                  <span>📅 {post.date || 'Upcoming'}</span>
+                  <span>📍 {post.location || post.venue || 'Campus'}</span>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Events Feed Header */}
-        <div>
-          <div className="flex justify-between items-center mb-3 px-0.5">
-            <h3 className="text-sm font-extrabold text-white">
-              {selectedCategory === 'All' ? 'All Campus Events' : selectedCategory}
-            </h3>
-            <span className="text-[11px] text-sky-400 bg-sky-950/80 border border-sky-800/60 px-2.5 py-0.5 rounded-md font-semibold">
-              {filteredPosts.length} Items
-            </span>
-          </div>
+                <h4 className="font-bold text-sm text-white leading-snug">{post.title}</h4>
+                <p className="text-xs text-slate-300 leading-relaxed">{post.description}</p>
 
-          {/* Event Cards */}
-          <div className="space-y-4">
-            {filteredPosts.map((post) => {
-              const pId = post.id || post._id;
-              return (
-                <div key={pId} className="bg-[#0a1120] border border-slate-800/90 rounded-2xl overflow-hidden shadow-lg">
+                {/* Footer Actions */}
+                <div className="flex justify-between items-center pt-3 border-t border-slate-800">
+                  <span className="text-slate-400 font-medium text-[11px]">
+                    {post.author?.name || post.club || 'Student Union'}
+                  </span>
                   
-                  {/* Image Container with Floating Badge */}
-                  <div className="relative h-40 w-full bg-slate-950">
-                    <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
-                    <span className="absolute top-3 right-3 bg-[#071328]/90 border border-sky-800/60 text-sky-400 text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-sm">
-                      {post.category}
-                    </span>
-                  </div>
+                  {/* Interactive Like Button */}
+                  <button 
+                    onClick={() => handleLike(post.id, post.likes || 0)}
+                    className="flex items-center space-x-1.5 bg-sky-950/60 hover:bg-sky-900/60 text-sky-400 border border-sky-800/50 px-3 py-1 rounded-lg text-xs transition"
+                  >
+                    <span>❤️</span>
+                    <span className="font-semibold">{likes}</span>
+                  </button>
+                </div>
 
-                  {/* Card Content */}
-                  <div className="p-4">
-                    <div className="flex justify-between items-center text-[11px] text-sky-400 font-medium mb-2">
-                      <span className="flex items-center gap-1">📅 {post.date}</span>
-                      <span className="flex items-center gap-1 text-sky-300">📍 {post.location}</span>
+                {/* Inline Comment System */}
+                <div className="mt-3 pt-2 border-t border-slate-800/60 space-y-2">
+                  {comments.length > 0 && (
+                    <div className="space-y-1 bg-[#050b14]/60 p-2 rounded-lg">
+                      {comments.map((c, idx) => (
+                        <p key={idx} className="text-[11px] text-slate-300">
+                          <strong className="text-sky-400">{c.user}: </strong>{c.text}
+                        </p>
+                      ))}
                     </div>
+                  )}
 
-                    <h3 className="text-base font-bold text-white text-center mb-1.5">{post.title}</h3>
-                    <p className="text-xs text-slate-400 text-center leading-relaxed mb-4">{post.description}</p>
-
-                    {/* Footer Actions */}
-                    <div className="flex justify-between items-center pt-3 border-t border-slate-800/80 text-xs">
-                      <span className="text-slate-500 font-medium text-[11px]">
-                        {post.author?.name || 'Student Union'}
-                      </span>
-                      <button className="bg-sky-950/80 text-sky-400 border border-sky-800/60 hover:bg-sky-900/60 px-3.5 py-1 rounded-lg text-[11px] font-bold transition-colors">
-                        Explore
-                      </button>
-                    </div>
+                  <div className="flex space-x-2 pt-1">
+                    <input 
+                      type="text" 
+                      placeholder="Add a comment..."
+                      value={commentInputs[post.id] || ''}
+                      onChange={(e) => setCommentInputs({ ...commentInputs, [post.id]: e.target.value })}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddComment(post.id)}
+                      className="flex-1 bg-[#050b14] border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
+                    />
+                    <button 
+                      onClick={() => handleAddComment(post.id)}
+                      className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold px-3 py-1 rounded-lg text-[11px] transition"
+                    >
+                      Post
+                    </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Bottom Bar Header */}
-        <div className="pt-2 text-center">
-          <button className="w-full bg-[#0d172a] hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl border border-slate-800 text-xs shadow-md transition-all">
-            Publish Event
-          </button>
-        </div>
-
-      </div>
+              </div>
+            </div>
+          );
+        })}
+      </section>
     </div>
   );
 };
