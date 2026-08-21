@@ -1,10 +1,13 @@
-# Community Hub
+# week 11: community hub event inviter
 
-A full-stack community management platform built with React, Node.js/Express, and MongoDB.
+## Author
+- **Name:** Albert(Efan Tech)
+- **GitHub:** [@efan-tech](https://github.com/efan-tech)
+- **Date:** August 21, 2026
 
-## 🚀 Live Deployments
-- **Frontend (Vercel):** https://community-hub-murex.vercel.app
-- **Backend (Render):** https://community-hub-2af6.onrender.com
+## Project Description
+A full-stack community platform that allows people to invite each other to any kind of event — arts, tech meetups, sports, or general activities. Users can create event invites, view the community feed, RSVP, comment, and interact with other members.
+
 
 ## 🛠️ Tech Stack
 - **Frontend:** React, Vite, Tailwind CSS, Axios
@@ -12,19 +15,14 @@ A full-stack community management platform built with React, Node.js/Express, an
 - **Hosting:** Vercel (Frontend), Render (Backend)
 ## 👥 Contributors
 
-- **Stella / Efan Tech** ([@efan-tech](https://github.com/efan-tech)) — Lead Developer & Architect
+- ** Efan Tech** ([@efan-tech](https://github.com/efan-tech)) — Lead Developer & Architect
 - **Musembi Joel** ([@musembijoel](https://github.com/musembijoel)) — Contributor
 - **Francis Waceke** ([@wacekefrancis2-droid](https://github.com/wacekefrancis2-droid)) — Contributor
 - **Nahashon Munyiri Mutahi** ([@nahashonmutahi95](https://github.com/nahashonmutahi95)) — Contributor
 - **Mercy Muiruri** ([@mercymuiruri-hue](https://github.com/mercymuiruri-hue)) — Contributor
 - **Yvonne** ([@yvonneofficials06](https://github.com/yvonneofficials06)) — Contributor
 
-## 📁 Repository Structure
-community-hub/
-├── frontend/    # Vite + React UI & Components
-└── backend/     # Express API Routes & Database Models
-
-## ⚙️ Local Development Setup
+## ⚙️ How To Run 
 
 ### 1. Clone Repository
 ```bash
@@ -43,4 +41,8 @@ cd ../backend
 npm install
 npm start
 ```
+## 🚀 Live Deployments
+- **Frontend (Vercel):** https://community-hub-murex.vercel.app
+- **Backend (Render):** https://community-hub-2af6.onrender.com
+
 
