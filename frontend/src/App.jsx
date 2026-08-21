@@ -3,85 +3,72 @@ import API from './api';
 import Dashboard from './pages/Dashboard';
 import Feedback from './pages/Feedback';
 
-// Initial Mock Data preserved so existing events never vanish
-const INITIAL_MOCK_POSTS = [
-  {
-    id: 'mock-1',
-    title: 'Quantum Code Hackathon 2026',
-    category: 'Hackathons',
-    date: 'Aug 20 - Aug 22',
-    location: 'Science Complex • Lab 3',
-    description: '48-hour build sprint! Team up to construct web apps, network tools, and AI engines.',
-    club: 'Computer Science Guild',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80',
-    likes: 12,
-    comments: [],
-    isNew: false
-  },
-  {
-    id: 'mock-2',
-    title: 'Campus Cultural Fest & Food Bazaar',
-    category: 'Cultural Festivals',
-    date: 'Aug 25',
-    location: 'Student Amphitheater',
-    description: 'Live acoustic sets, global street food stalls, traditional fashion displays, and night performances.',
-    club: 'Student Union',
-    image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=800&q=80',
-    likes: 24,
-    comments: [],
-    isNew: false
-  },
-  {
-    id: 'mock-3',
-    title: 'Coastal Summer Tide Retreat',
-    category: 'Summer Tides',
-    date: 'Sep 02 - Sep 04',
-    location: 'South Coast Marine Bay',
-    description: 'End-of-term weekend trip! Beach sports, campfire sessions, coastal exploration, and group transit.',
-    club: 'Adventure & Outdoor Club',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
-    likes: 18,
-    comments: [],
-    isNew: false
-  }
-];
-
 function App() {
-  const [posts, setPosts] = useState(INITIAL_MOCK_POSTS);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showFeedback, setShowFeedback] = useState(false);
 
-  // Read logged-in user from localStorage or fallback to default
+  // Current logged-in user (simple version for now)
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('ql_user');
-    return saved ? JSON.parse(saved) : { username: 'Nahashon', handle: '@nahashon_tech', status: 'Active' };
+    return saved
+      ? JSON.parse(saved)
+      : { username: 'Nahashon', handle: '@nahashon_tech', status: 'Active' };
   });
 
+  // Fetch all events from the backend
+  const loadEvents = async () => {
+    try {
+      const res = await API.get('/events');
+      setEvents(res.data || []);
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    API.get('/api/posts')
-      .then((res) => {
-        if (res.data && res.data.length > 0) {
-          // Merge API posts with initial mock posts so mock data is NEVER removed
-          setPosts([...res.data, ...INITIAL_MOCK_POSTS]);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error fetching posts, using mock data baseline:', err);
-        setLoading(false);
-      });
+    loadEvents();
   }, []);
 
-  // Handler to append newly created posts to state with a subtle highlight flag
-  const handleAddPost = (newPost) => {
-    const postWithGlow = {
-      ...newPost,
-      id: Date.now().toString(),
-      likes: 0,
-      comments: [],
-      isNew: true // Used for the subtle "attractive goo/glow" effect
-    };
-    setPosts([postWithGlow, ...posts]);
+  // When a new event is created
+  const handleAddEvent = async (newEventData) => {
+    try {
+      const res = await API.post('/events', {
+        ...newEventData,
+        author: {
+          name: currentUser.username || 'Anonymous',
+          handle: currentUser.handle || '',
+          avatar: currentUser.avatar || ''
+        }
+      });
+
+      // Add the new event to the top of the list
+      setEvents([res.data, ...events]);
+    } catch (err) {
+      console.error('Error creating event:', err);
+      alert('Failed to create event. Please try again.');
+    }
+  };
+
+  // When someone RSVPs
+  const handleRsvp = async (eventId, status) => {
+    try {
+      const res = await API.post(`/events/${eventId}/rsvp`, {
+        name: currentUser.username || 'Anonymous',
+        status: status   // 'going' | 'maybe' | 'not-going'
+      });
+
+      // Update the event in the list
+      setEvents(prev =>
+        prev.map(ev => (ev._id === eventId ? res.data : ev))
+      );
+    } catch (err) {
+      console.error('RSVP error:', err);
+      alert('Failed to RSVP. Please try again.');
+    }
   };
 
   if (loading) {
@@ -107,9 +94,10 @@ function App() {
   }
 
   return (
-    <Dashboard 
-      posts={posts} 
-      onAddPost={handleAddPost} 
+    <Dashboard
+      events={events}
+      onAddEvent={handleAddEvent}
+      onRsvp={handleRsvp}
       currentUser={currentUser}
       setCurrentUser={setCurrentUser}
       setShowFeedback={setShowFeedback}

@@ -19,7 +19,7 @@ const eventSchema = new mongoose.Schema({
     required: true,
     enum: [
       'Arts',
-      'Faith',
+      'Catholic / Faith',
       'Praise & Worship',
       'Tech & Innovation',
       'Sports',
@@ -37,7 +37,7 @@ const eventSchema = new mongoose.Schema({
     avatar: { type: String }
   },
   rsvps: [rsvpSchema],
-  joinedCount: { type: Number, default: 0 },   // how many said "going"
+  joinedCount: { type: Number, default: 0 },
   comments: [{
     user: String,
     text: String,
