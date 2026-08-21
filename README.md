@@ -12,7 +12,7 @@ A full-stack community management platform built with React, Node.js/Express, an
 - **Hosting:** Vercel (Frontend), Render (Backend)
 ## 👥 Contributors
 
-- **Stella / Efan Tech** ([@efan-tech](https://github.com/efan-tech)) — Lead Developer & Architect
+- ** Efan Tech** ([@efan-tech](https://github.com/efan-tech)) — Lead Developer & Architect
 - **Musembi Joel** ([@musembijoel](https://github.com/musembijoel)) — Contributor
 - **Francis Waceke** ([@wacekefrancis2-droid](https://github.com/wacekefrancis2-droid)) — Contributor
 - **Nahashon Munyiri Mutahi** ([@nahashonmutahi95](https://github.com/nahashonmutahi95)) — Contributor
