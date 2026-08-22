@@ -1,33 +1,24 @@
-import React, { useState } from 'react';
+
+    import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import API from '../api';
+// NOTE: API import intentionally unused for the demo (bypass) flow.
+// Re-enable it below when wiring the real backend back in.
+// import API from '../api';
 
 const Login = () => {
   const [formData, setFormData] = useState({ identifier: '', password: '' });
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  // Bypass flow: typing anything and clicking the button takes the user
+  // straight to /dashboard with no backend call. Mirrors Register.jsx.
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
-
-    try {
-      // Sends 'identifier' (username or email) and 'password' to your backend
-      const res = await API.post('/auth/login', {
-        email: formData.identifier, // backend can accept this or username
-        username: formData.identifier,
-        password: formData.password
-      });
-
-      localStorage.setItem('token', res.data.token);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || 'Access Denied. Check your credentials.');
-    }
+    localStorage.setItem('token', 'quantum-operator-session');
+    navigate('/dashboard');
   };
 
   return (
@@ -36,8 +27,6 @@ const Login = () => {
         <div style={styles.badge}>QUANTUM LOGIC VERIFICATION</div>
         <h2 style={styles.title}>System Login</h2>
         <p style={styles.subtitle}>Enter your username or email to access the terminal.</p>
-
-        {error && <div style={styles.errorBox}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputGroup}>
@@ -72,7 +61,7 @@ const Login = () => {
         </form>
 
         <p style={styles.footerText}>
-          New to the system? <Link to="/register" style={styles.link}>Request Registration</Link>
+          New to the system? <Link to="/dashboard" style={styles.link}>Request Registration</Link>
         </p>
       </div>
     </div>
@@ -123,15 +112,6 @@ const styles = {
     fontSize: '14px',
     color: '#94a3b8',
     lineHeight: '1.5',
-  },
-  errorBox: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-    border: '1px solid rgba(239, 68, 68, 0.3)',
-    color: '#f87171',
-    padding: '12px',
-    borderRadius: '8px',
-    fontSize: '13px',
-    marginBottom: '20px',
   },
   form: {
     display: 'flex',
