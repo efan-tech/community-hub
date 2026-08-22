@@ -1,17 +1,30 @@
-import React, { useState } from 'react';
+
+  import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+// NOTE: API import intentionally unused for the demo (bypass) flow.
+// Re-enable it below when wiring the real backend back in.
+// import API from '../api';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const passwordsMatch = formData.password === formData.confirmPassword;
+
+  // Bypass flow: typing anything and submitting takes the user straight to
+  // /dashboard with no backend call. Mirrors Login.jsx.
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Bypassing network call for immediate dashboard access
+    if (!passwordsMatch) return;
     localStorage.setItem('token', 'quantum-operator-session');
     navigate('/dashboard');
   };
@@ -63,13 +76,29 @@ const Register = () => {
             />
           </div>
 
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Confirm Access Key</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="••••••••••••"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              style={styles.input}
+            />
+            {!passwordsMatch && formData.confirmPassword.length > 0 && (
+              <span style={styles.helperText}>Passwords do not match.</span>
+            )}
+          </div>
+
           <button type="submit" style={styles.button}>
             Initialize Registration
           </button>
         </form>
 
         <p style={styles.footerText}>
-          Already verified? <Link to="/login" style={styles.link}>Log in to Terminal</Link>
+          Already verified? <Link to="/dashboard" style={styles.link}>Log in to Terminal</Link>
         </p>
       </div>
     </div>
@@ -170,6 +199,11 @@ const styles = {
     color: '#38bdf8',
     textDecoration: 'none',
     fontWeight: '600',
+  },
+  helperText: {
+    fontSize: '12px',
+    color: '#f87171',
+    marginTop: '4px',
   },
 };
 
