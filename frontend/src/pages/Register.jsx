@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // NOTE: API import intentionally unused for the demo (bypass) flow.
@@ -8,7 +7,9 @@ import { Link, useNavigate } from 'react-router-dom';
 const Register = () => {
   const [formData, setFormData] = useState({
     username: '',
-    email: ''
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
   const navigate = useNavigate();
 
@@ -16,10 +17,13 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const passwordsMatch = formData.password === formData.confirmPassword;
+
   // Bypass flow: typing anything and submitting takes the user straight to
   // /dashboard with no backend call. Mirrors Login.jsx.
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!passwordsMatch) return;
     localStorage.setItem('token', 'quantum-operator-session');
     navigate('/dashboard');
   };
@@ -58,7 +62,6 @@ const Register = () => {
             />
           </div>
 
-          {/* ——— Access-key gate removed. Old code retained for re-enable ———
           <div style={styles.inputGroup}>
             <label style={styles.label}>Access Key (Password)</label>
             <input
@@ -87,7 +90,6 @@ const Register = () => {
               <span style={styles.helperText}>Passwords do not match.</span>
             )}
           </div>
-          */}
 
           <button type="submit" style={styles.button}>
             Initialize Registration
@@ -197,6 +199,13 @@ const styles = {
     textDecoration: 'none',
     fontWeight: '600',
   },
+  helperText: {
+    fontSize: '12px',
+    color: '#f87171',
+    marginTop: '4px',
+  },
 };
 
 export default Register;
+
+    
